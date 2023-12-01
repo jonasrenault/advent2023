@@ -1,6 +1,6 @@
 # Advent of Code 2023
 
-Repository of my code for [Advent of Code 2023](https://adventofcode.com/2022)
+Repository of my code for [Advent of Code 2023](https://adventofcode.com/2023)
 
 ## Install
 
