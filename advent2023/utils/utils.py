@@ -24,7 +24,7 @@ SESSION_FILE = ROOT_DIR / ".secret-session-cookie"
 class Advent:
     year: int
     day: int
-    session: str
+    session = ""
     S = requests.Session()
 
     def __init__(self, day: int, year: int = 2023) -> None:
@@ -57,7 +57,7 @@ class Advent:
         if not self.session:
             error = f"Unable to read session cookie info. {SESSION_FILE.absolute()} is not a file."
             LOGGER.critical(error)
-            raise ValueError(error)
+            raise FileNotFoundError(error)
         LOGGER.info("Session cookie loaded.")
 
     def get_input(self) -> str:
