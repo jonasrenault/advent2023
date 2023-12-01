@@ -1,18 +1,8 @@
-import re
+from utils.utils import Advent
 
-with open("advent2023/input.txt", "r") as f:
-    lines = f.readlines()
+advent = Advent(1)
 
-lines = [l.strip() for l in lines]
-
-calibration = [tuple(c for c in l if c in "123456789") for l in lines]
-calibration = [int(c[0] + c[-1]) for c in calibration]
-print(sum(calibration))
-
-with open("advent2023/input.txt", "r") as f:
-    puzzle = f.read()
-
-digits = {
+DIGITS = {
     "one": "1",
     "two": "2",
     "three": "3",
@@ -23,12 +13,24 @@ digits = {
     "eight": "8",
     "nine": "9",
 }
-for k, v in digits.items():
-    puzzle = puzzle.replace(k, k + v + k)
 
-lines = puzzle.split("\n")
-lines = [l.strip() for l in lines]
-calibration = [tuple(c for c in l if c in "123456789") for l in lines]
-calibration = [int(c[0] + c[-1]) for c in calibration]
-print(calibration)
-print(sum(calibration))
+
+def calibration(lines: list[str]) -> int:
+    calibration = [tuple(c for c in l if c.isdigit()) for l in lines]
+    calibration = [int(c[0] + c[-1]) for c in calibration]
+    return sum(calibration)
+
+
+def main():
+    lines = advent.get_input_lines()
+    advent.submit(1, calibration(lines))
+
+    input = advent.get_input()
+    for k, v in DIGITS.items():
+        input = input.replace(k, k + v + k)
+    lines = list(map(lambda l: l.strip(), input.rstrip("\n").split("\n")))
+    advent.submit(2, calibration(lines))
+
+
+if __name__ == "__main__":
+    main()
