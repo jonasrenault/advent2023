@@ -1,5 +1,6 @@
 from utils.utils import Advent
-import numpy as np
+from collections import defaultdict
+from math import prod
 
 advent = Advent(3)
 
@@ -11,6 +12,12 @@ def main():
     number_indices = get_number_indices(puzzle)
     parts = [get_number(puzzle, i) for i in number_indices if is_part(puzzle, i)]
     advent.submit(1, sum(parts))
+
+    gears = defaultdict(set)
+    for index in number_indices:
+        for gear_idx in get_gears(puzzle, index):
+            gears[gear_idx].add(get_number(puzzle, index))
+    advent.submit(2, sum([prod(g) for g in gears.values() if len(g) == 2]))
 
 
 def get_number_indices(puzzle: list[list[str]]) -> list[tuple[int, int, int]]:
@@ -60,6 +67,20 @@ def get_number(puzzle: list[list[str]], index: tuple[int, int, int]) -> int:
 
     i, j, k = index
     return int(puzzle[i][j : k + 1])
+
+
+def get_gears(puzzle: list[list[str]], index: tuple[int, int, int]):
+    gears = []
+    i, j, k = index
+    for x in range(j, k + 1):
+        for a, b in DIRS:
+            if (
+                0 <= i + a < len(puzzle)
+                and 0 <= x + b < len(puzzle[0])
+                and puzzle[i + a][x + b] == "*"
+            ):
+                gears.append((i + a, x + b))
+    return gears
 
 
 if __name__ == "__main__":
