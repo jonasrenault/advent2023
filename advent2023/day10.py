@@ -32,15 +32,14 @@ def main():
 
     # Count number of points inside polygon
     count = 0
-    new_map = grid
     for x in range(grid.shape[0]):
         for y in range(grid.shape[1]):
             if is_point_inside_polygon(grid, x, y):
                 count += 1
-                new_map[x][y] = "X"
+                grid[x][y] = "X"
 
     for x in range(grid.shape[0]):
-        print("".join(new_map[x]).translate(tbl))
+        print("".join(grid[x]).translate(tbl))
     advent.submit(2, count)
 
 
