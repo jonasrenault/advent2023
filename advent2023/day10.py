@@ -109,7 +109,8 @@ def intersections(grid: npt.NDArray[np.str_], x: int, y: int) -> int:
     Count the # of intersections by drawing a line to the right
     of the point.
     Intersections are |, or any other section of pipe which is not
-    horizontal (i.e L---J or F---7).
+    horizontal (i.e L---J or F---7 are horizontal lines,
+    whereas L---7 or F---J are not).
 
     Args:
         grid (npt.NDArray[np.str_]): grid where only pipes are different from .
@@ -140,10 +141,10 @@ def intersections(grid: npt.NDArray[np.str_], x: int, y: int) -> int:
 
 def is_point_inside_polygon(grid: npt.NDArray[np.str_], x: int, y: int) -> bool:
     """
-    Check if point is inside polygon
+    Check if point is inside polygon.
 
     Args:
-        grid (npt.NDArray[np.str_]): the
+        grid (npt.NDArray[np.str_]): the grid
         x (int): point x
         y (int): point y
 
