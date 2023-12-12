@@ -1,7 +1,6 @@
 from utils.utils import Advent
 from itertools import combinations
 from tqdm import tqdm
-from math import comb, prod
 from functools import lru_cache
 
 advent = Advent(12)
@@ -67,37 +66,6 @@ def search(row: str, idx: int, broken: tuple[int, ...], chunk_length: int) -> in
             total += search(row, idx + 1, broken[1:], 0)
 
     return total
-
-
-def arr(row: str, broken: tuple[int, ...]) -> list[str]:
-    chunks = [c for c in row.split(".") if c]
-    # associer les séries de # à chaque chunk
-
-    c = 0
-    for split in split_broken(broken, len(chunks)):
-        split_works = [possible(c, b) for c, b in zip(chunks, split)]
-        if all(split_works):
-            c += 1
-    return c
-
-
-def split_broken(broken: tuple[int, ...], l: int):
-    res = []
-    for splits in combinations(list(range(1, len(broken))), l - 1):
-        start = 0
-        split = []
-        for s in splits:
-            split.append(broken[start:s])
-            start = s
-        split.append(broken[start:])
-        res.append(split)
-    return res
-
-
-def possible(chunk: str, broken: tuple[int, ...]):
-    available = chunk.count("?")
-    to_pick = sum(broken) - chunk.count("#") + len(broken) - 1
-    return to_pick <= available
 
 
 def arrangements(row: str, broken: tuple[int, ...]) -> list[str]:
