@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.11"
 numpy = "^1.26.2"
 requests = "^2.31.0"
+tqdm = "^4.66.1"
 
 
 [tool.poetry.group.dev.dependencies]
