@@ -1,6 +1,7 @@
 from utils.utils import Advent
 import operator
 from collections.abc import Callable
+from math import prod
 
 
 advent = Advent(19)
@@ -16,6 +17,46 @@ def main():
         if dest == "A":
             ratings += sum(part.values())
     advent.submit(1, ratings)
+
+    ranges = {k: (1, 4000) for k in "xmas"}
+    advent.submit(2, accepted_vals(rules, ranges, "in"))
+
+
+def accepted_vals(
+    rules: dict[
+        str, list[tuple[str, Callable[[int, int], bool], int, str] | tuple[str]]
+    ],
+    ranges: dict[str, tuple[int, int]],
+    rule: str = "in",
+):
+    if rule == "A":
+        return prod([high - low + 1 for low, high in ranges.values()])
+    if rule == "R":
+        return 0
+
+    conditions = rules[rule][:-1]
+    last = rules[rule][-1][0]
+    total = 0
+    for rating, op, val, dest in conditions:
+        low, high = ranges[rating]
+
+        if op is operator.lt:
+            if low < val:
+                new_ranges = ranges | {rating: (low, val - 1)}
+                total += accepted_vals(rules, new_ranges, dest)
+
+            if high >= val:
+                ranges |= {rating: (val, high)}
+        else:
+            if high > val:
+                new_ranges = ranges | {rating: (val + 1, high)}
+                total += accepted_vals(rules, new_ranges, dest)
+
+            if low <= val:
+                ranges |= {rating: (low, val)}
+
+    total += accepted_vals(rules, ranges, last)
+    return total
 
 
 def apply_rules(
