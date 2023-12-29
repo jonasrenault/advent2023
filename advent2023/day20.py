@@ -1,17 +1,25 @@
 from utils.utils import Advent
 from collections import defaultdict, deque
 from tqdm import tqdm
+from collections.abc import Iterable
+from abc import ABC, abstractmethod
 
 
 advent = Advent(20)
 
 
-class FlipFlop:
-    def __init__(self, children) -> None:
+class Module(ABC):
+    @abstractmethod
+    def process(self, pulse: str, sender: str) -> list[tuple[str, str]]:
+        pass
+
+
+class FlipFlop(Module):
+    def __init__(self, children: list[str]) -> None:
         self.children = children
         self.on = False
 
-    def process(self, pulse, sender):
+    def process(self, pulse: str, sender: str) -> list[tuple[str, str]]:
         if pulse == "high":
             return None
         self.on = not self.on
@@ -24,24 +32,24 @@ class FlipFlop:
         return "%" + ("on" if self.on else "off") + " -> " + ",".join(self.children)
 
 
-class Broadcast:
-    def __init__(self, children) -> None:
+class Broadcast(Module):
+    def __init__(self, children: list[str]) -> None:
         self.children = children
 
-    def process(self, pulse, sender):
+    def process(self, pulse: str, sender: str) -> list[tuple[str, str]]:
         return [(child, pulse) for child in self.children]
 
 
-class Conjunction:
-    def __init__(self, children) -> None:
+class Conjunction(Module):
+    def __init__(self, children: list[str]) -> None:
         self.children = children
         self.memory = {}
 
-    def set_inputs(self, inputs):
+    def set_inputs(self, inputs: Iterable[str]):
         for input in inputs:
             self.memory[input] = "low"
 
-    def process(self, pulse, sender):
+    def process(self, pulse: str, sender: str) -> list[tuple[str, str]]:
         self.memory[sender] = pulse
         if "low" in self.memory.values():
             send = "high"
@@ -74,14 +82,26 @@ def main():
     low = 0
     high = 0
     for i in tqdm(range(1000)):
-        l, h = process(modules)
+        l, h = press_btn(modules)
         low += l
         high += h
 
     advent.submit(1, low * high)
 
 
-def process(modules):
+def press_btn(modules: dict[str, Module]) -> tuple[int, int]:
+    """
+    Press button module, sending a low pulse to broadcaster module and
+    all processing all subsequent pulses. Returns the count of low and
+    high pulses sent.
+
+    Args:
+        modules (dict[str, Module]): the modules
+
+    Returns:
+        tuple[int, int]: the low and high pulses count
+    """
+
     queue = deque()
     queue.append(("button", "low", "broadcaster"))
 
@@ -102,7 +122,7 @@ def process(modules):
     return low, high
 
 
-def get_modules(lines):
+def get_modules(lines: list[str]) -> dict[str, Module]:
     modules = {}
     inputs = defaultdict(set)
     for line in lines:
@@ -116,6 +136,7 @@ def get_modules(lines):
             modules[name] = FlipFlop(children)
         else:
             modules[name] = Broadcast(children)
+
     for name, module in modules.items():
         if type(module) is Conjunction:
             module.set_inputs(inputs[name])
