@@ -3,15 +3,12 @@ from utils.utils import Advent
 from itertools import product
 from collections import defaultdict
 from uuid import uuid4
-from string import ascii_letters
 
 
 advent = Advent(22)
 
 
 class Brick:
-    count = 0
-
     def __init__(self, start: tuple[int, int, int], end: tuple[int, int, int]) -> None:
         cubes = []
         for i in range(len(start)):
@@ -28,8 +25,6 @@ class Brick:
             cubes.append(start)
         self.cubes = cubes
         self.id = str(uuid4())
-        # self.id = ascii_letters[Brick.count]
-        # Brick.count += 1
 
     @property
     def min_height(self) -> int:
@@ -63,15 +58,20 @@ def main():
     bricks = get_bricks(lines)
     bricks.sort(key=lambda x: x.min_height)
     fall_bricks(bricks)
-    bricks.sort(key=lambda x: x.min_height)
-    print(bricks)
-    # print(bricks)
-    # print(len(count_deletable(bricks)))
-    # advent.submit(1, len(count_deletable(bricks)))
+    advent.submit(1, len(get_removable(bricks)))
 
 
-def count_deletable(bricks):
-    # find which bricks support which
+def get_removable(bricks: list[Brick]) -> set[Brick]:
+    """
+    Find bricks which can be safely removed
+
+    Args:
+        bricks (list[Brick]): the list of bricks
+
+    Returns:
+        set[Brick]: set of bricks which can be removed
+    """
+    # for each brick, find which other bricks it rests on
     supports = defaultdict(set)
     for i in range(len(bricks)):
         brick = bricks[i]
@@ -79,14 +79,11 @@ def count_deletable(bricks):
             if ob.supports(brick):
                 supports[brick.id].add(ob.id)
 
-    # any brick can be deleted unless it supports another brick alone
+    # any brick can be deleted unless it supports another brick by itself
     deletable = set([b.id for b in bricks])
     for values in supports.values():
         if len(values) == 1:
-            try:
-                deletable.remove(values.pop())
-            except KeyError:
-                pass
+            deletable.discard(values.pop())
     return deletable
 
 
@@ -104,12 +101,14 @@ def fall_bricks(bricks: list[Brick]):
         if brick.min_height == 1:
             continue
 
-        # find any brick below it which overlaps with it
-        for ob in bricks[:i][::-1]:
+        # else, find bricks below which overlap with it
+        below = set()
+        for ob in bricks[:i]:
             if brick.overlaps(ob):
-                # set the new height as this brick's max height + 1
-                brick.set_height(ob.max_height + 1)
-                break
+                below.add(ob)
+        if below:
+            # set height of brick to max height of bricks below + 1
+            brick.set_height(max([b.max_height for b in below]) + 1)
         else:
             # if no brick was found, it rests on the floor
             brick.set_height(1)
@@ -123,12 +122,6 @@ def get_bricks(lines: list[str]) -> list[Brick]:
         right = right.split(",")
         left = tuple([int(x) for x in left])
         right = tuple([int(x) for x in right])
-        diff = 0
-        for l, r in zip(left, right):
-            if l != r:
-                diff += 1
-        if diff > 1:
-            print(line)
         bricks.append(Brick(left, right))
     return bricks
 
