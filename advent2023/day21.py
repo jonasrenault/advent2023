@@ -31,7 +31,9 @@ def neighbors(
             yield (rr, rc)
 
 
-def step(grid, nodes):
+def step(
+    grid: npt.NDArray[np.str_], nodes: set[tuple[int, int]]
+) -> set[tuple[int, int]]:
     next_nodes = set()
     for node in nodes:
         for neighbor in neighbors(grid, node):
