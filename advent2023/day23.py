@@ -20,15 +20,10 @@ def main():
     end = (h - 1, np.where(grid[h - 1, :] == ".")[0][0])
 
     graph = grid_to_graph(grid, start, end, False)
-    best = longest_path(graph, end, start, 0, set())
-    print(best)
-    # advent.submit(1, dfs(grid, start, end))
+    advent.submit(1, longest_path(graph, end, start, 0, set()))
 
     graph = grid_to_graph(grid, start, end, True)
-    best = longest_path(graph, end, start, 0, set())
-    print(best)
-
-    # print(dfs(grid, start, end, False))
+    advent.submit(2, longest_path(graph, end, start, 0, set()))
 
 
 def grid_to_graph(
